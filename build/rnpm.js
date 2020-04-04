@@ -69,20 +69,35 @@
     return _extends.apply(this, arguments);
   }
 
-  function _objectSpread(target) {
+  function ownKeys(object, enumerableOnly) {
+    var keys = Object.keys(object);
+
+    if (Object.getOwnPropertySymbols) {
+      var symbols = Object.getOwnPropertySymbols(object);
+      if (enumerableOnly) symbols = symbols.filter(function (sym) {
+        return Object.getOwnPropertyDescriptor(object, sym).enumerable;
+      });
+      keys.push.apply(keys, symbols);
+    }
+
+    return keys;
+  }
+
+  function _objectSpread2(target) {
     for (var i = 1; i < arguments.length; i++) {
       var source = arguments[i] != null ? arguments[i] : {};
-      var ownKeys = Object.keys(source);
 
-      if (typeof Object.getOwnPropertySymbols === 'function') {
-        ownKeys = ownKeys.concat(Object.getOwnPropertySymbols(source).filter(function (sym) {
-          return Object.getOwnPropertyDescriptor(source, sym).enumerable;
-        }));
+      if (i % 2) {
+        ownKeys(Object(source), true).forEach(function (key) {
+          _defineProperty(target, key, source[key]);
+        });
+      } else if (Object.getOwnPropertyDescriptors) {
+        Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
+      } else {
+        ownKeys(Object(source)).forEach(function (key) {
+          Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
+        });
       }
-
-      ownKeys.forEach(function (key) {
-        _defineProperty(target, key, source[key]);
-      });
     }
 
     return target;
@@ -117,6 +132,19 @@
     };
 
     return _setPrototypeOf(o, p);
+  }
+
+  function _isNativeReflectConstruct() {
+    if (typeof Reflect === "undefined" || !Reflect.construct) return false;
+    if (Reflect.construct.sham) return false;
+    if (typeof Proxy === "function") return true;
+
+    try {
+      Date.prototype.toString.call(Reflect.construct(Date, [], function () {}));
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   function _objectWithoutPropertiesLoose(source, excluded) {
@@ -169,6 +197,23 @@
     }
 
     return _assertThisInitialized(self);
+  }
+
+  function _createSuper(Derived) {
+    return function () {
+      var Super = _getPrototypeOf(Derived),
+          result;
+
+      if (_isNativeReflectConstruct()) {
+        var NewTarget = _getPrototypeOf(this).constructor;
+
+        result = Reflect.construct(Super, arguments, NewTarget);
+      } else {
+        result = Super.apply(this, arguments);
+      }
+
+      return _possibleConstructorReturn(this, result);
+    };
   }
 
   /**
@@ -234,68 +279,6 @@
     }
 
     return arr;
-  }
-  /**
-   * Higher order component to deprecate usage of component.
-   * message - deprecate warning message
-   * methods - array of method names to be delegated to deprecated component
-   */
-
-  function deprecatedComponent(message) {
-    var methods = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-    return function deprecatedComponentHOC(Component) {
-      var _temp;
-
-      return _temp =
-      /*#__PURE__*/
-      function (_React$Component) {
-        _inherits(DeprecatedComponent, _React$Component);
-
-        function DeprecatedComponent() {
-          var _getPrototypeOf2;
-
-          var _this;
-
-          _classCallCheck(this, DeprecatedComponent);
-
-          for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-            args[_key2] = arguments[_key2];
-          }
-
-          _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(DeprecatedComponent)).call.apply(_getPrototypeOf2, [this].concat(args)));
-
-          _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "onRef", function (ref) {
-            return _this.ref = ref;
-          });
-
-          methods.forEach(function (name) {
-            // delegate methods to the component
-            _this[name] = function () {
-              var _this$ref;
-
-              return _this.ref && (_this$ref = _this.ref)[name].apply(_this$ref, arguments);
-            };
-          });
-          return _this;
-        }
-
-        _createClass(DeprecatedComponent, [{
-          key: "render",
-          value: function render() {
-            return React__default.createElement(Component, _extends({}, this.props, {
-              ref: this.onRef
-            }));
-          }
-        }, {
-          key: "componentDidMount",
-          value: function componentDidMount() {
-            console.warn(message);
-          }
-        }]);
-
-        return DeprecatedComponent;
-      }(React__default.Component), _temp;
-    };
   }
 
   function createCommonjsModule(fn, module) {
@@ -1057,15 +1040,15 @@
   function withContext(Context) {
     var propName = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : "context";
     return function wrap(Component) {
-      var EnhanceContext =
-      /*#__PURE__*/
-      function (_React$Component) {
+      var EnhanceContext = /*#__PURE__*/function (_React$Component) {
         _inherits(EnhanceContext, _React$Component);
+
+        var _super = _createSuper(EnhanceContext);
 
         function EnhanceContext() {
           _classCallCheck(this, EnhanceContext);
 
-          return _possibleConstructorReturn(this, _getPrototypeOf(EnhanceContext).apply(this, arguments));
+          return _super.apply(this, arguments);
         }
 
         _createClass(EnhanceContext, [{
@@ -1075,11 +1058,11 @@
                 forwardedRef = _this$props.forwardedRef,
                 rest = _objectWithoutProperties(_this$props, ["forwardedRef"]);
 
-            return React__default.createElement(Context.Consumer, null, function (value) {
+            return /*#__PURE__*/React__default.createElement(Context.Consumer, null, function (value) {
               var _custom;
 
               var custom = (_custom = {}, _defineProperty(_custom, propName, value), _defineProperty(_custom, "ref", forwardedRef), _custom);
-              return React__default.createElement(Component, _extends({}, custom, rest));
+              return /*#__PURE__*/React__default.createElement(Component, _extends({}, custom, rest));
             });
           }
         }]);
@@ -1091,7 +1074,7 @@
       var consumerName = Context.Consumer.displayName || Context.Consumer.name || "Context.Consumer";
 
       function enhanceForwardRef(props, ref) {
-        return React__default.createElement(EnhanceContext, _extends({}, props, {
+        return /*#__PURE__*/React__default.createElement(EnhanceContext, _extends({}, props, {
           forwardedRef: ref
         }));
       }
@@ -1171,7 +1154,7 @@
         return;
       }
 
-      var menu = _objectSpread({}, menus.get(name), {
+      var menu = _objectSpread2({}, menus.get(name), {
         optionsCustomStyles: optionsCustomStyles
       });
 
@@ -1204,18 +1187,18 @@
     };
   }
 
-  var OPEN_ANIM_DURATION = 225;
-  var CLOSE_ANIM_DURATION = 195;
-  var USE_NATIVE_DRIVER = reactNative.Platform.OS !== "web";
+  // import { Platform } from 'react-native';
+  // common durations of animation
+  var OPEN_ANIM_DURATION = 100;
+  var CLOSE_ANIM_DURATION = 200;
+  var USE_NATIVE_DRIVER = true;
 
-  var Backdrop =
-  /*#__PURE__*/
-  function (_Component) {
+  var Backdrop = /*#__PURE__*/function (_Component) {
     _inherits(Backdrop, _Component);
 
-    function Backdrop() {
-      var _getPrototypeOf2;
+    var _super = _createSuper(Backdrop);
 
+    function Backdrop() {
       var _this;
 
       _classCallCheck(this, Backdrop);
@@ -1224,7 +1207,7 @@
         args[_key] = arguments[_key];
       }
 
-      _this = _possibleConstructorReturn(this, (_getPrototypeOf2 = _getPrototypeOf(Backdrop)).call.apply(_getPrototypeOf2, [this].concat(args)));
+      _this = _super.call.apply(_super, [this].concat(args));
       _this.fadeAnim = new reactNative.Animated.Value(0.001);
       return _this;
     }
@@ -1261,13 +1244,13 @@
         var _this$props = this.props,
             onPress = _this$props.onPress,
             style = _this$props.style;
-        return React__default.createElement(reactNative.TouchableWithoutFeedback, {
+        return /*#__PURE__*/React__default.createElement(reactNative.TouchableWithoutFeedback, {
           onPress: onPress
-        }, React__default.createElement(reactNative.Animated.View, {
+        }, /*#__PURE__*/React__default.createElement(reactNative.Animated.View, {
           style: [styles.fullscreen, {
             opacity: this.fadeAnim
           }]
-        }, React__default.createElement(reactNative.View, {
+        }, /*#__PURE__*/React__default.createElement(reactNative.View, {
           style: [styles.fullscreen, style]
         })));
       }
@@ -1292,11 +1275,11 @@
 
   var CFG = {
     debug: false
-    /**
-     * Debug logger depending on `Menu.debug` static porperty.
-     */
-
   };
+  /**
+   * Debug logger depending on `Menu.debug` static porperty.
+   */
+
   var debug = function debug() {
     var _console;
 
@@ -1307,17 +1290,17 @@
     CFG.debug && (_console = console).log.apply(_console, ['react-native-popup-menu'].concat(args));
   };
 
-  var MenuPlaceholder =
-  /*#__PURE__*/
-  function (_Component) {
+  var MenuPlaceholder = /*#__PURE__*/function (_Component) {
     _inherits(MenuPlaceholder, _Component);
+
+    var _super = _createSuper(MenuPlaceholder);
 
     function MenuPlaceholder(props) {
       var _this;
 
       _classCallCheck(this, MenuPlaceholder);
 
-      _this = _possibleConstructorReturn(this, _getPrototypeOf(MenuPlaceholder).call(this, props));
+      _this = _super.call(this, props);
       _this.state = {};
       return _this;
     }
@@ -1343,9 +1326,9 @@
           return null;
         }
 
-        return React__default.createElement(reactNative.View, {
+        return /*#__PURE__*/React__default.createElement(reactNative.View, {
           style: styles$1.placeholder
-        }, React__default.createElement(Backdrop, {
+        }, /*#__PURE__*/React__default.createElement(Backdrop, {
           onPress: ctx._onBackdropPress,
           style: backdropStyles,
           ref: ctx.onBackdropRef
@@ -1381,7 +1364,7 @@
         other = _objectWithoutProperties(props, ["style", "children", "layouts"]);
 
     var position = computePosition(layouts);
-    return React__default.createElement(reactNative.View, _extends({}, other, {
+    return /*#__PURE__*/React__default.createElement(reactNative.View, _extends({}, other, {
       style: [styles$2.options, style, position],
       collapsable: false
     }), children);
@@ -1414,19 +1397,19 @@
 
   var instanceCount = 0;
 
-  var MenuProvider =
-  /*#__PURE__*/
-  function (_Component) {
+  var MenuProvider = /*#__PURE__*/function (_Component) {
     _inherits(MenuProvider, _Component);
+
+    var _super = _createSuper(MenuProvider);
 
     function MenuProvider(props) {
       var _this;
 
       _classCallCheck(this, MenuProvider);
 
-      _this = _possibleConstructorReturn(this, _getPrototypeOf(MenuProvider).call(this, props));
+      _this = _super.call(this, props);
 
-      _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "_handleBackButton", function () {
+      _defineProperty(_assertThisInitialized(_this), "_handleBackButton", function () {
         var backHandler = _this.props.backHandler;
         debug('_handleBackButton called', backHandler); // Default handler if true is passed
 
@@ -1440,25 +1423,25 @@
 
 
         if (typeof backHandler === 'function') {
-          return backHandler(_assertThisInitialized(_assertThisInitialized(_this)));
+          return backHandler(_assertThisInitialized(_this));
         }
 
         return false;
       });
 
-      _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "onBackdropRef", function (r) {
+      _defineProperty(_assertThisInitialized(_this), "onBackdropRef", function (r) {
         _this.backdropRef = r;
       });
 
-      _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "onOptionsRef", function (r) {
+      _defineProperty(_assertThisInitialized(_this), "onOptionsRef", function (r) {
         _this.optionsRef = r;
       });
 
-      _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "_onPlaceholderRef", function (r) {
+      _defineProperty(_assertThisInitialized(_this), "_onPlaceholderRef", function (r) {
         return _this._placeholderRef = r;
       });
 
-      _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "_onBackdropPress", function () {
+      _defineProperty(_assertThisInitialized(_this), "_onBackdropPress", function () {
         debug('on backdrop press');
 
         var menu = _this._getOpenedMenu();
@@ -1470,7 +1453,7 @@
         _this.closeMenu();
       });
 
-      _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "_onLayout", function (_ref) {
+      _defineProperty(_assertThisInitialized(_this), "_onLayout", function (_ref) {
         var layout = _ref.nativeEvent.layout;
 
         if (layoutsEqual(_this._ownLayout, layout)) {
@@ -1501,7 +1484,7 @@
         });
       });
 
-      _defineProperty(_assertThisInitialized(_assertThisInitialized(_this)), "_onSafeAreaLayout", function (_ref2) {
+      _defineProperty(_assertThisInitialized(_this), "_onSafeAreaLayout", function (_ref2) {
         var layout = _ref2.nativeEvent.layout;
 
         if (layoutsEqual(_this._safeAreaLayout, layout)) {
@@ -1766,22 +1749,22 @@
             style = _this$props2.style,
             customStyles = _this$props2.customStyles;
         debug('render menu', this.isMenuOpen(), this._ownLayout);
-        return React__default.createElement(PopupMenuContext.Provider, {
+        return /*#__PURE__*/React__default.createElement(PopupMenuContext.Provider, {
           value: this.menuCtx
-        }, React__default.createElement(reactNative.View, {
+        }, /*#__PURE__*/React__default.createElement(reactNative.View, {
           style: styles$3.flex1,
           onLayout: this._onLayout
-        }, React__default.createElement(reactNative.View, {
+        }, /*#__PURE__*/React__default.createElement(reactNative.View, {
           style: [styles$3.flex1, customStyles.menuContextWrapper, customStyles.menuProviderWrapper, style]
-        }, this.props.children), React__default.createElement(reactNative.SafeAreaView, {
+        }, this.props.children), /*#__PURE__*/React__default.createElement(reactNative.SafeAreaView, {
           style: styles$3.safeArea,
           pointerEvents: "box-none"
-        }, React__default.createElement(reactNative.View, {
+        }, /*#__PURE__*/React__default.createElement(reactNative.View, {
           style: styles$3.flex1,
           collapsable: false,
           pointerEvents: "box-none",
           onLayout: this._onSafeAreaLayout
-        }), React__default.createElement(MenuPlaceholder, {
+        }), /*#__PURE__*/React__default.createElement(MenuPlaceholder, {
           ctx: this,
           backdropStyles: customStyles.backdrop,
           ref: this._onPlaceholderRef
@@ -1870,7 +1853,7 @@
           safeAreaLayout: safeAreaLayout
         };
 
-        var props = _objectSpread({}, rendererProps, {
+        var props = _objectSpread2({}, rendererProps, {
           style: style,
           onLayout: onLayout,
           layouts: layouts
@@ -1911,15 +1894,15 @@
     }
   });
 
-  var MenuOptions =
-  /*#__PURE__*/
-  function (_React$Component) {
+  var MenuOptions = /*#__PURE__*/function (_React$Component) {
     _inherits(MenuOptions, _React$Component);
+
+    var _super = _createSuper(MenuOptions);
 
     function MenuOptions() {
       _classCallCheck(this, MenuOptions);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(MenuOptions).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     _createClass(MenuOptions, [{
@@ -1951,7 +1934,7 @@
             customStyles = _this$props.customStyles,
             style = _this$props.style,
             children = _this$props.children;
-        return React__default.createElement(reactNative.View, {
+        return /*#__PURE__*/React__default.createElement(reactNative.View, {
           style: [customStyles.optionsWrapper, style]
         }, children);
       }
@@ -1969,15 +1952,15 @@
   };
   var MenuOptions$1 = withCtx(MenuOptions);
 
-  var MenuTrigger =
-  /*#__PURE__*/
-  function (_Component) {
+  var MenuTrigger = /*#__PURE__*/function (_Component) {
     _inherits(MenuTrigger, _Component);
+
+    var _super = _createSuper(MenuTrigger);
 
     function MenuTrigger() {
       _classCallCheck(this, MenuTrigger);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(MenuTrigger).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     _createClass(MenuTrigger, [{
@@ -2002,7 +1985,8 @@
             menuName = _this$props.menuName,
             triggerOnLongPress = _this$props.triggerOnLongPress,
             onAlternativeAction = _this$props.onAlternativeAction,
-            other = _objectWithoutProperties(_this$props, ["disabled", "onRef", "text", "children", "style", "customStyles", "menuName", "triggerOnLongPress", "onAlternativeAction"]);
+            touchableProps = _this$props.touchableProps,
+            other = _objectWithoutProperties(_this$props, ["disabled", "onRef", "text", "children", "style", "customStyles", "menuName", "triggerOnLongPress", "onAlternativeAction", "touchableProps"]);
 
         var onPress = function onPress() {
           return !disabled && _this._onPress();
@@ -2012,16 +1996,16 @@
             Touchable = _makeTouchable.Touchable,
             defaultTouchableProps = _makeTouchable.defaultTouchableProps;
 
-        return React__default.createElement(reactNative.View, {
+        return /*#__PURE__*/React__default.createElement(reactNative.View, {
           ref: onRef,
           collapsable: false,
           style: customStyles.triggerOuterWrapper
-        }, React__default.createElement(Touchable, _extends({
+        }, /*#__PURE__*/React__default.createElement(Touchable, _extends({
           onPress: triggerOnLongPress ? onAlternativeAction : onPress,
           onLongPress: triggerOnLongPress ? onPress : onAlternativeAction
-        }, defaultTouchableProps, customStyles.triggerTouchable), React__default.createElement(reactNative.View, _extends({}, other, {
+        }, touchableProps, defaultTouchableProps, customStyles.triggerTouchable), /*#__PURE__*/React__default.createElement(reactNative.View, _extends({}, other, {
           style: [customStyles.triggerWrapper, style]
-        }), text ? React__default.createElement(reactNative.Text, {
+        }), text ? /*#__PURE__*/React__default.createElement(reactNative.Text, {
           style: customStyles.triggerText
         }, text) : children)));
       }
@@ -2145,19 +2129,20 @@
     return fitPositionIntoSafeArea(position, layouts);
   };
 
-  var ContextMenu =
-  /*#__PURE__*/
-  function (_React$Component) {
+  var ContextMenu = /*#__PURE__*/function (_React$Component) {
     _inherits(ContextMenu, _React$Component);
+
+    var _super = _createSuper(ContextMenu);
 
     function ContextMenu(props) {
       var _this;
 
       _classCallCheck(this, ContextMenu);
 
-      _this = _possibleConstructorReturn(this, _getPrototypeOf(ContextMenu).call(this, props));
+      _this = _super.call(this, props);
       _this.state = {
-        scaleAnim: new reactNative.Animated.Value(0.1)
+        opacityAnim: new reactNative.Animated.Value(0),
+        scaleAnim: new reactNative.Animated.Value(0.8)
       };
       return _this;
     }
@@ -2171,6 +2156,12 @@
           easing: reactNative.Easing.out(reactNative.Easing.cubic),
           useNativeDriver: USE_NATIVE_DRIVER
         }).start();
+        reactNative.Animated.timing(this.state.opacityAnim, {
+          duration: OPEN_ANIM_DURATION,
+          toValue: 1,
+          easing: reactNative.Easing.out(reactNative.Easing.cubic),
+          useNativeDriver: true
+        }).start();
       }
     }, {
       key: "close",
@@ -2180,10 +2171,16 @@
         return new Promise(function (resolve) {
           reactNative.Animated.timing(_this2.state.scaleAnim, {
             duration: CLOSE_ANIM_DURATION,
-            toValue: 0,
+            toValue: 0.8,
             easing: reactNative.Easing.in(reactNative.Easing.cubic),
             useNativeDriver: USE_NATIVE_DRIVER
           }).start(resolve);
+          reactNative.Animated.timing(_this2.state.opacityAnim, {
+            duration: CLOSE_ANIM_DURATION,
+            toValue: 0,
+            easing: reactNative.Easing.in(reactNative.Easing.cubic),
+            useNativeDriver: true
+          }).start();
         });
       }
     }, {
@@ -2201,9 +2198,9 @@
           }],
           opacity: this.state.scaleAnim
         };
-        var position = computePosition$1(layouts, reactNative.I18nManager.isRTL);
-        return React__default.createElement(reactNative.Animated.View, _extends({}, other, {
-          style: [styles$4.options, style, animation, position]
+        var position = computePosition$1(layouts, false);
+        return /*#__PURE__*/React__default.createElement(reactNative.Animated.View, _extends({}, other, {
+          style: [styles$4.options, style, animation]
         }), children);
       }
     }]);
@@ -2215,17 +2212,14 @@
   var styles$4 = reactNative.StyleSheet.create({
     options: {
       position: 'absolute',
-      borderRadius: 2,
-      backgroundColor: 'white',
-      width: reactNative.PixelRatio.roundToNearestPixel(200),
       // Shadow only works on iOS.
       shadowColor: 'black',
-      shadowOpacity: 0.3,
       shadowOffset: {
         width: 3,
         height: 3
       },
-      shadowRadius: 4,
+      shadowOpacity: 0.2,
+      shadowRadius: 5.0,
       // This will elevate the view on Android, causing shadow to be drawn.
       elevation: 5
     }
@@ -2243,17 +2237,17 @@
     return c.type === MenuOptions$1;
   };
 
-  var Menu =
-  /*#__PURE__*/
-  function (_Component) {
+  var Menu = /*#__PURE__*/function (_Component) {
     _inherits(Menu, _Component);
+
+    var _super = _createSuper(Menu);
 
     function Menu(props) {
       var _this;
 
       _classCallCheck(this, Menu);
 
-      _this = _possibleConstructorReturn(this, _getPrototypeOf(Menu).call(this, props));
+      _this = _super.call(this, props);
       _this._name = _this.props.name || makeName();
       _this._forceClose = false;
       var ctx = props.ctx;
@@ -2334,7 +2328,7 @@
 
         var children = this._reduceChildren();
 
-        return React__default.createElement(reactNative.View, {
+        return /*#__PURE__*/React__default.createElement(reactNative.View, {
           style: style
         }, children);
       }
@@ -2439,15 +2433,15 @@
     Menu.defaultProps.rendererProps = rendererProps;
   };
 
-  var MenuOption =
-  /*#__PURE__*/
-  function (_Component) {
+  var MenuOption = /*#__PURE__*/function (_Component) {
     _inherits(MenuOption, _Component);
+
+    var _super = _createSuper(MenuOption);
 
     function MenuOption() {
       _classCallCheck(this, MenuOption);
 
-      return _possibleConstructorReturn(this, _getPrototypeOf(MenuOption).apply(this, arguments));
+      return _super.apply(this, arguments);
     }
 
     _createClass(MenuOption, [{
@@ -2477,7 +2471,7 @@
         // FIXME react 16.3 workaround for ControlledExample!
         var menu = this.props.ctx.menuActions._getOpenedMenu() || {};
         var optionsCustomStyles = menu.optionsCustomStyles;
-        return _objectSpread({}, optionsCustomStyles, this.props.customStyles);
+        return _objectSpread2({}, optionsCustomStyles, {}, this.props.customStyles);
       }
     }, {
       key: "render",
@@ -2499,16 +2493,16 @@
 
         if (disabled) {
           var disabledStyles = [defaultStyles.optionTextDisabled, customStyles.optionText];
-          return React__default.createElement(reactNative.View, {
+          return /*#__PURE__*/React__default.createElement(reactNative.View, {
             style: [defaultStyles.option, customStyles.optionWrapper, style]
-          }, text ? React__default.createElement(reactNative.Text, {
+          }, text ? /*#__PURE__*/React__default.createElement(reactNative.Text, {
             style: disabledStyles
           }, text) : children);
         }
 
-        var rendered = React__default.createElement(reactNative.View, {
+        var rendered = /*#__PURE__*/React__default.createElement(reactNative.View, {
           style: [defaultStyles.option, customStyles.optionWrapper, style]
-        }, text ? React__default.createElement(reactNative.Text, {
+        }, text ? /*#__PURE__*/React__default.createElement(reactNative.Text, {
           style: customStyles.optionText
         }, text) : children);
 
@@ -2519,7 +2513,7 @@
               Touchable = _makeTouchable.Touchable,
               defaultTouchableProps = _makeTouchable.defaultTouchableProps;
 
-          return React__default.createElement(Touchable, _extends({
+          return /*#__PURE__*/React__default.createElement(Touchable, _extends({
             onPress: function onPress() {
               return _this._onSelect();
             }
@@ -2554,584 +2548,16 @@
   });
   var MenuOption$1 = withCtx(MenuOption);
 
-  /**
-  Simplified version of ContextMenu without animation.
-  */
-
-  var NotAnimatedContextMenu =
-  /*#__PURE__*/
-  function (_React$Component) {
-    _inherits(NotAnimatedContextMenu, _React$Component);
-
-    function NotAnimatedContextMenu() {
-      _classCallCheck(this, NotAnimatedContextMenu);
-
-      return _possibleConstructorReturn(this, _getPrototypeOf(NotAnimatedContextMenu).apply(this, arguments));
-    }
-
-    _createClass(NotAnimatedContextMenu, [{
-      key: "render",
-      value: function render() {
-        var _this$props = this.props,
-            style = _this$props.style,
-            children = _this$props.children,
-            layouts = _this$props.layouts,
-            other = _objectWithoutProperties(_this$props, ["style", "children", "layouts"]);
-
-        var position = computePosition$1(layouts);
-        return React__default.createElement(reactNative.View, _extends({}, other, {
-          style: [styles$4.options, style, position]
-        }), children);
-      }
-    }]);
-
-    return NotAnimatedContextMenu;
-  }(React__default.Component);
-
-  var computePosition$2 = function computePosition(layouts) {
-    var windowLayout = layouts.windowLayout,
-        optionsLayout = layouts.optionsLayout;
-    var wHeight = windowLayout.height;
-    var oHeight = optionsLayout.height;
-    var top = wHeight - oHeight;
-    var left = 0,
-        right = 0;
-    var position = {
-      top: top,
-      left: left,
-      right: right
-    }; // TODO what is the best way to handle safeArea?
-    // most likely some extra paddings inside SlideInMenu 
-
-    return position;
-  };
-
-  var SlideInMenu =
-  /*#__PURE__*/
-  function (_React$Component) {
-    _inherits(SlideInMenu, _React$Component);
-
-    function SlideInMenu(props) {
-      var _this;
-
-      _classCallCheck(this, SlideInMenu);
-
-      _this = _possibleConstructorReturn(this, _getPrototypeOf(SlideInMenu).call(this, props));
-      _this.state = {
-        slide: new reactNative.Animated.Value(0)
-      };
-      return _this;
-    }
-
-    _createClass(SlideInMenu, [{
-      key: "componentDidMount",
-      value: function componentDidMount() {
-        reactNative.Animated.timing(this.state.slide, {
-          duration: OPEN_ANIM_DURATION,
-          toValue: 1,
-          easing: reactNative.Easing.out(reactNative.Easing.cubic),
-          useNativeDriver: USE_NATIVE_DRIVER
-        }).start();
-      }
-    }, {
-      key: "close",
-      value: function close() {
-        var _this2 = this;
-
-        return new Promise(function (resolve) {
-          reactNative.Animated.timing(_this2.state.slide, {
-            duration: CLOSE_ANIM_DURATION,
-            toValue: 0,
-            easing: reactNative.Easing.in(reactNative.Easing.cubic),
-            useNativeDriver: USE_NATIVE_DRIVER
-          }).start(resolve);
-        });
-      }
-    }, {
-      key: "render",
-      value: function render() {
-        var _this$props = this.props,
-            style = _this$props.style,
-            children = _this$props.children,
-            layouts = _this$props.layouts,
-            other = _objectWithoutProperties(_this$props, ["style", "children", "layouts"]);
-
-        var oHeight = layouts.optionsLayout.height;
-        var animation = {
-          transform: [{
-            translateY: this.state.slide.interpolate({
-              inputRange: [0, 1],
-              outputRange: [oHeight, 0]
-            })
-          }]
-        };
-        var position = computePosition$2(layouts);
-        return React__default.createElement(reactNative.Animated.View, _extends({
-          style: [styles$5.options, style, animation, position]
-        }, other), children);
-      }
-    }]);
-
-    return SlideInMenu;
-  }(React__default.Component);
-  var styles$5 = reactNative.StyleSheet.create({
-    options: {
-      position: 'absolute',
-      backgroundColor: 'white',
-      // Shadow only works on iOS.
-      shadowColor: 'black',
-      shadowOpacity: 0.3,
-      shadowOffset: {
-        width: 3,
-        height: 3
-      },
-      shadowRadius: 4,
-      // This will elevate the view on Android, causing shadow to be drawn.
-      elevation: 5
-    }
-  });
-
-  var popoverPadding = 7;
-  var anchorSize = 15;
-  var anchorHyp = Math.sqrt(anchorSize * anchorSize + anchorSize * anchorSize);
-  var anchorOffset = (anchorHyp + anchorSize) / 2 - popoverPadding; // left/top placement
-
-  function axisNegativeSideProperties(_ref) {
-    var oDim = _ref.oDim,
-        tPos = _ref.tPos;
-    return {
-      position: tPos - oDim
-    };
-  } // right/bottom placement
-
-
-  function axisPositiveSideProperties(_ref2) {
-    var tPos = _ref2.tPos,
-        tDim = _ref2.tDim;
-    // substract also anchor placeholder from the beginning
-    return {
-      position: tPos + tDim - anchorSize
-    };
-  } // computes offsets (off screen overlap) of popover when trying to align it to the center
-
-
-  function centeringProperties(_ref3) {
-    var oDim = _ref3.oDim,
-        wDim = _ref3.wDim,
-        tPos = _ref3.tPos,
-        tDim = _ref3.tDim;
-    var center = Math.round(tPos + tDim / 2);
-    var leftOffset = oDim / 2 - center;
-    var rightOffset = center + oDim / 2 - wDim;
-    return {
-      center: center,
-      leftOffset: leftOffset,
-      rightOffset: rightOffset
-    };
-  }
-  /**
-   * Computes position and offset of popover when trying to align it to the triger center.
-   * It consideres window boundaries.
-   * Returns object with keys:
-   *   - position: <Number> Absolute position - top/left,
-   *   - offset: <Number> window overlapping size if window boundaries were not considered
-   */
-
-
-  function axisCenteredPositionProperties(options) {
-    var oDim = options.oDim,
-        wDim = options.wDim;
-
-    var _centeringProperties = centeringProperties(options),
-        center = _centeringProperties.center,
-        leftOffset = _centeringProperties.leftOffset,
-        rightOffset = _centeringProperties.rightOffset;
-
-    if (leftOffset > 0 || rightOffset > 0) {
-      // right/bottom position is better
-      if (leftOffset < rightOffset) {
-        return {
-          offset: rightOffset,
-          position: wDim - oDim
-        };
-      } // left/top position is better
-
-
-      if (rightOffset < leftOffset) {
-        return {
-          offset: -leftOffset,
-          position: 0
-        };
-      }
-    } // centered position
-
-
-    return {
-      offset: 0,
-      position: center - oDim / 2
-    };
-  }
-  /* Evaluate centering placement */
-
-
-  function getCenteringPrice(options) {
-    var _centeringProperties2 = centeringProperties(options),
-        leftOffset = _centeringProperties2.leftOffset,
-        rightOffset = _centeringProperties2.rightOffset; // TODO: currently shifted popovers have higher price,
-    // popover shift could be taken into account with the same price
-
-
-    return Math.max(0, leftOffset) + Math.max(0, rightOffset);
-  }
-  /* Evaluate top placement */
-
-
-  function getTopPrice(hOptions, vOptions) {
-    var centerOffset = getCenteringPrice(vOptions);
-    var sideOffset = Math.max(0, hOptions.oDim - hOptions.tPos);
-    return centerOffset + sideOffset;
-  }
-  /* Evaluate bottom placement */
-
-
-  function getBottomPrice(hOptions, vOptions) {
-    var centerOffset = getCenteringPrice(vOptions);
-    var sideOffset = Math.max(0, hOptions.tPos + hOptions.tDim + hOptions.oDim - hOptions.wDim);
-    return centerOffset + sideOffset;
-  }
-  /* Evaluate left placement */
-
-
-  function getLeftPrice(hOptions, vOptions) {
-    var centerOffset = getCenteringPrice(hOptions);
-    var sideOffset = Math.max(0, vOptions.oDim - vOptions.tPos);
-    return centerOffset + sideOffset;
-  }
-  /* Evaluate right placement */
-
-
-  function getRightPrice(hOptions, vOptions) {
-    var centerOffset = getCenteringPrice(hOptions);
-    var sideOffset = Math.max(0, vOptions.tPos + vOptions.tDim + vOptions.oDim - vOptions.wDim);
-    return centerOffset + sideOffset;
-  }
-
-  function getStartPosKey(isRTL) {
-    return isRTL ? 'right' : 'left';
-  }
-
-  function topProperties(hOptions, vOptions, isRTL) {
-    var centered = axisCenteredPositionProperties(vOptions);
-    var side = axisNegativeSideProperties(hOptions);
-    return {
-      position: _defineProperty({
-        top: side.position
-      }, getStartPosKey(isRTL), centered.position),
-      offset: centered.offset,
-      placement: 'top'
-    };
-  }
-
-  function bottomProperties(hOptions, vOptions, isRTL) {
-    var centered = axisCenteredPositionProperties(vOptions);
-    var side = axisPositiveSideProperties(hOptions);
-    return {
-      position: _defineProperty({
-        top: side.position
-      }, getStartPosKey(isRTL), centered.position),
-      offset: centered.offset,
-      placement: 'bottom'
-    };
-  }
-
-  function rightProperties(hOptions, vOptions, isRTL) {
-    var centered = axisCenteredPositionProperties(hOptions);
-    var side = axisPositiveSideProperties(vOptions);
-    return {
-      position: _defineProperty({
-        top: centered.position
-      }, getStartPosKey(isRTL), side.position),
-      offset: centered.offset,
-      placement: 'right'
-    };
-  }
-
-  function leftProperties(hOptions, vOptions, isRTL) {
-    var centered = axisCenteredPositionProperties(hOptions);
-    var side = axisNegativeSideProperties(vOptions);
-    return {
-      position: _defineProperty({
-        top: centered.position
-      }, getStartPosKey(isRTL), side.position),
-      offset: centered.offset,
-      placement: 'left'
-    };
-  } // maps placement to function which computes correct properties
-
-
-  var propertiesByPlacement = {
-    top: topProperties,
-    bottom: bottomProperties,
-    left: leftProperties,
-    right: rightProperties
-  };
-  /**
-   * Computes properties needed for drawing popover.
-   * Returns object with keys:
-   *   - position: <Object> { top: Number, left: Number } - popover absolute position
-   *   - placement: <Enum> top|left|top|bottom - position to the trigger
-   *   - offset: <Number> value by which must be anchor shifted
-   */
-
-  function computeProperties(_ref4, placement, preferredPlacement, isRTL) {
-    var windowLayout = _ref4.windowLayout,
-        triggerLayout = _ref4.triggerLayout,
-        optionsLayout = _ref4.optionsLayout;
-    var wX = windowLayout.x,
-        wY = windowLayout.y,
-        wWidth = windowLayout.width,
-        wHeight = windowLayout.height;
-    var tX = triggerLayout.x,
-        tY = triggerLayout.y,
-        tHeight = triggerLayout.height,
-        tWidth = triggerLayout.width;
-    var oHeight = optionsLayout.height,
-        oWidth = optionsLayout.width;
-    var hOptions = {
-      oDim: oHeight + popoverPadding * 2,
-      wDim: wHeight,
-      tPos: tY - wY,
-      tDim: tHeight
-    };
-    var vOptions = {
-      oDim: oWidth + popoverPadding * 2,
-      wDim: wWidth,
-      tPos: tX - wX,
-      tDim: tWidth
-    };
-
-    if (placement !== 'auto' && propertiesByPlacement[placement]) {
-      return propertiesByPlacement[placement](hOptions, vOptions, isRTL);
-    }
-
-    var prices = {
-      top: getTopPrice(hOptions, vOptions),
-      bottom: getBottomPrice(hOptions, vOptions),
-      right: getRightPrice(hOptions, vOptions),
-      left: getLeftPrice(hOptions, vOptions)
-    };
-    var bestPrice = Object.values(prices).sort(function (a, b) {
-      return a - b;
-    })[0];
-    var bestPlacement = prices[preferredPlacement] === bestPrice ? preferredPlacement : Object.keys(prices).find(function (pl) {
-      return prices[pl] === bestPrice;
-    });
-    return propertiesByPlacement[bestPlacement](hOptions, vOptions, isRTL);
-  }
-
-  var Popover =
-  /*#__PURE__*/
-  function (_React$Component) {
-    _inherits(Popover, _React$Component);
-
-    function Popover(props) {
-      var _this;
-
-      _classCallCheck(this, Popover);
-
-      _this = _possibleConstructorReturn(this, _getPrototypeOf(Popover).call(this, props));
-      _this.state = {
-        scaleAnim: new reactNative.Animated.Value(0.1)
-      };
-      return _this;
-    }
-
-    _createClass(Popover, [{
-      key: "componentDidMount",
-      value: function componentDidMount() {
-        reactNative.Animated.timing(this.state.scaleAnim, {
-          duration: OPEN_ANIM_DURATION,
-          toValue: 1,
-          easing: reactNative.Easing.out(reactNative.Easing.cubic),
-          useNativeDriver: USE_NATIVE_DRIVER
-        }).start();
-      }
-    }, {
-      key: "close",
-      value: function close() {
-        var _this2 = this;
-
-        return new Promise(function (resolve) {
-          reactNative.Animated.timing(_this2.state.scaleAnim, {
-            duration: CLOSE_ANIM_DURATION,
-            toValue: 0,
-            easing: reactNative.Easing.in(reactNative.Easing.cubic),
-            useNativeDriver: USE_NATIVE_DRIVER
-          }).start(resolve);
-        });
-      }
-    }, {
-      key: "render",
-      value: function render() {
-        var _this$props = this.props,
-            style = _this$props.style,
-            children = _this$props.children,
-            layouts = _this$props.layouts,
-            anchorStyle = _this$props.anchorStyle,
-            preferredPlacement = _this$props.preferredPlacement,
-            userPlacement = _this$props.placement,
-            other = _objectWithoutProperties(_this$props, ["style", "children", "layouts", "anchorStyle", "preferredPlacement", "placement"]);
-
-        var isRTL = reactNative.I18nManager.isRTL;
-        var animation = {
-          transform: [{
-            scale: this.state.scaleAnim
-          }],
-          opacity: this.state.scaleAnim
-        };
-
-        var _computeProperties = computeProperties(layouts, userPlacement, preferredPlacement, isRTL),
-            position = _computeProperties.position,
-            placement = _computeProperties.placement,
-            offset = _computeProperties.offset;
-
-        return React__default.createElement(reactNative.Animated.View, {
-          style: [styles$6.animated, animation, position, getContainerStyle({
-            placement: placement,
-            isRTL: isRTL
-          })],
-          pointerEvents: "box-none"
-        }, React__default.createElement(reactNative.View, {
-          style: [styles$6.anchor, dynamicAnchorStyle({
-            placement: placement,
-            offset: offset,
-            isRTL: isRTL
-          }), anchorStyle]
-        }), React__default.createElement(reactNative.View, _extends({}, other, {
-          style: [styles$6.options, style]
-        }), children));
-      }
-    }]);
-
-    return Popover;
-  }(React__default.Component);
-  Popover.propTypes = {
-    anchorStyle: propTypes.oneOfType([propTypes.object, propTypes.number, propTypes.array]),
-    placement: propTypes.oneOf(['auto', 'top', 'right', 'bottom', 'left']),
-    preferredPlacement: propTypes.oneOf(['top', 'right', 'bottom', 'left'])
-  };
-  Popover.defaultProps = {
-    preferredPlacement: 'top',
-    placement: 'auto'
-  };
-
-  var getContainerStyle = function getContainerStyle(_ref5) {
-    var placement = _ref5.placement,
-        isRTL = _ref5.isRTL;
-    return {
-      left: {
-        flexDirection: isRTL ? 'row' : 'row-reverse'
-      },
-      right: {
-        flexDirection: isRTL ? 'row-reverse' : 'row'
-      },
-      top: {
-        flexDirection: 'column-reverse'
-      },
-      bottom: {
-        flexDirection: 'column'
-      }
-    }[placement];
-  };
-
-  var dynamicAnchorStyle = function dynamicAnchorStyle(_ref6) {
-    var _ref7, _ref8;
-
-    var offset = _ref6.offset,
-        placement = _ref6.placement,
-        isRTL = _ref6.isRTL;
-    var start = getStartPosKey(isRTL);
-
-    switch (placement) {
-      case 'right':
-        return {
-          top: offset,
-          transform: [{
-            translateX: anchorOffset
-          }, {
-            rotate: '45deg'
-          }]
-        };
-
-      case 'left':
-        return {
-          top: offset,
-          transform: [{
-            translateX: -anchorOffset
-          }, {
-            rotate: '45deg'
-          }]
-        };
-
-      case 'top':
-        return _ref7 = {}, _defineProperty(_ref7, start, offset), _defineProperty(_ref7, "transform", [{
-          translateY: -anchorOffset
-        }, {
-          rotate: '45deg'
-        }]), _ref7;
-
-      case 'bottom':
-        return _ref8 = {}, _defineProperty(_ref8, start, offset), _defineProperty(_ref8, "transform", [{
-          translateY: anchorOffset
-        }, {
-          rotate: '45deg'
-        }]), _ref8;
-    }
-  };
-
-  var styles$6 = reactNative.StyleSheet.create({
-    animated: {
-      padding: popoverPadding,
-      backgroundColor: 'transparent',
-      position: 'absolute',
-      alignItems: 'center'
-    },
-    options: {
-      borderRadius: 2,
-      minWidth: anchorHyp,
-      minHeight: anchorHyp,
-      backgroundColor: 'white',
-      // Shadow only works on iOS.
-      shadowColor: 'black',
-      shadowOpacity: 0.3,
-      shadowOffset: {
-        width: 3,
-        height: 3
-      },
-      shadowRadius: 4,
-      // This will elevate the view on Android, causing shadow to be drawn.
-      elevation: 5
-    },
-    anchor: {
-      width: anchorSize,
-      height: anchorSize,
-      backgroundColor: 'white',
-      elevation: 5
-    }
-  });
+  // import SlideInMenu from './renderers/SlideInMenu';
+  // import Popover from './renderers/Popover';
 
   var renderers = {
-    ContextMenu: ContextMenu,
-    SlideInMenu: SlideInMenu,
-    NotAnimatedContextMenu: NotAnimatedContextMenu,
-    Popover: Popover
-  };
-  var MenuContext = deprecatedComponent('MenuContext is deprecated and it might be removed in future releases, use MenuProvider instead.', ['openMenu', 'toggleMenu', 'closeMenu', 'isMenuOpen'])(MenuProvider);
+    ContextMenu: ContextMenu
+  }; // const MenuContext = deprecatedComponent(
 
   exports.default = MenuExternal;
   exports.Menu = MenuExternal;
   exports.MenuProvider = MenuProvider;
-  exports.MenuContext = MenuContext;
   exports.MenuOption = MenuOption$1;
   exports.MenuOptions = MenuOptions$1;
   exports.MenuTrigger = MenuTrigger$1;
