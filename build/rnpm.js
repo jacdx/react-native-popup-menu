@@ -2,7 +2,7 @@
   typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('react-native'), require('react')) :
   typeof define === 'function' && define.amd ? define(['exports', 'react-native', 'react'], factory) :
   (global = global || self, factory(global.ReactNativePopupMenu = {}, global.reactNative, global.React));
-}(this, function (exports, reactNative, React) { 'use strict';
+}(this, (function (exports, reactNative, React) { 'use strict';
 
   var React__default = 'default' in React ? React['default'] : React;
 
@@ -251,7 +251,7 @@
     var Touchable = TouchableComponent || reactNative.Platform.select({
       android: reactNative.TouchableNativeFeedback,
       ios: reactNative.TouchableHighlight,
-      default: reactNative.TouchableHighlight
+      "default": reactNative.TouchableHighlight
     });
     var defaultTouchableProps = {};
 
@@ -280,10 +280,278 @@
 
     return arr;
   }
+  /**
+   * Higher order component to deprecate usage of component.
+   * message - deprecate warning message
+   * methods - array of method names to be delegated to deprecated component
+   */
+
+  function deprecatedComponent(message) {
+    var methods = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+    return function deprecatedComponentHOC(Component) {
+      var _temp;
+
+      return _temp = /*#__PURE__*/function (_React$Component) {
+        _inherits(DeprecatedComponent, _React$Component);
+
+        var _super = _createSuper(DeprecatedComponent);
+
+        function DeprecatedComponent() {
+          var _this;
+
+          _classCallCheck(this, DeprecatedComponent);
+
+          for (var _len2 = arguments.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+            args[_key2] = arguments[_key2];
+          }
+
+          _this = _super.call.apply(_super, [this].concat(args));
+
+          _defineProperty(_assertThisInitialized(_this), "onRef", function (ref) {
+            return _this.ref = ref;
+          });
+
+          methods.forEach(function (name) {
+            // delegate methods to the component
+            _this[name] = function () {
+              var _this$ref;
+
+              return _this.ref && (_this$ref = _this.ref)[name].apply(_this$ref, arguments);
+            };
+          });
+          return _this;
+        }
+
+        _createClass(DeprecatedComponent, [{
+          key: "render",
+          value: function render() {
+            return /*#__PURE__*/React__default.createElement(Component, _extends({}, this.props, {
+              ref: this.onRef
+            }));
+          }
+        }, {
+          key: "componentDidMount",
+          value: function componentDidMount() {
+            console.warn(message);
+          }
+        }]);
+
+        return DeprecatedComponent;
+      }(React__default.Component), _temp;
+    };
+  }
 
   function createCommonjsModule(fn, module) {
   	return module = { exports: {} }, fn(module, module.exports), module.exports;
   }
+
+  var reactIs_development = createCommonjsModule(function (module, exports) {
+
+
+
+  {
+    (function() {
+
+  // The Symbol used to tag the ReactElement-like types. If there is no native Symbol
+  // nor polyfill, then a plain number is used for performance.
+  var hasSymbol = typeof Symbol === 'function' && Symbol.for;
+  var REACT_ELEMENT_TYPE = hasSymbol ? Symbol.for('react.element') : 0xeac7;
+  var REACT_PORTAL_TYPE = hasSymbol ? Symbol.for('react.portal') : 0xeaca;
+  var REACT_FRAGMENT_TYPE = hasSymbol ? Symbol.for('react.fragment') : 0xeacb;
+  var REACT_STRICT_MODE_TYPE = hasSymbol ? Symbol.for('react.strict_mode') : 0xeacc;
+  var REACT_PROFILER_TYPE = hasSymbol ? Symbol.for('react.profiler') : 0xead2;
+  var REACT_PROVIDER_TYPE = hasSymbol ? Symbol.for('react.provider') : 0xeacd;
+  var REACT_CONTEXT_TYPE = hasSymbol ? Symbol.for('react.context') : 0xeace; // TODO: We don't use AsyncMode or ConcurrentMode anymore. They were temporary
+  // (unstable) APIs that have been removed. Can we remove the symbols?
+
+  var REACT_ASYNC_MODE_TYPE = hasSymbol ? Symbol.for('react.async_mode') : 0xeacf;
+  var REACT_CONCURRENT_MODE_TYPE = hasSymbol ? Symbol.for('react.concurrent_mode') : 0xeacf;
+  var REACT_FORWARD_REF_TYPE = hasSymbol ? Symbol.for('react.forward_ref') : 0xead0;
+  var REACT_SUSPENSE_TYPE = hasSymbol ? Symbol.for('react.suspense') : 0xead1;
+  var REACT_SUSPENSE_LIST_TYPE = hasSymbol ? Symbol.for('react.suspense_list') : 0xead8;
+  var REACT_MEMO_TYPE = hasSymbol ? Symbol.for('react.memo') : 0xead3;
+  var REACT_LAZY_TYPE = hasSymbol ? Symbol.for('react.lazy') : 0xead4;
+  var REACT_BLOCK_TYPE = hasSymbol ? Symbol.for('react.block') : 0xead9;
+  var REACT_FUNDAMENTAL_TYPE = hasSymbol ? Symbol.for('react.fundamental') : 0xead5;
+  var REACT_RESPONDER_TYPE = hasSymbol ? Symbol.for('react.responder') : 0xead6;
+  var REACT_SCOPE_TYPE = hasSymbol ? Symbol.for('react.scope') : 0xead7;
+
+  function isValidElementType(type) {
+    return typeof type === 'string' || typeof type === 'function' || // Note: its typeof might be other than 'symbol' or 'number' if it's a polyfill.
+    type === REACT_FRAGMENT_TYPE || type === REACT_CONCURRENT_MODE_TYPE || type === REACT_PROFILER_TYPE || type === REACT_STRICT_MODE_TYPE || type === REACT_SUSPENSE_TYPE || type === REACT_SUSPENSE_LIST_TYPE || typeof type === 'object' && type !== null && (type.$$typeof === REACT_LAZY_TYPE || type.$$typeof === REACT_MEMO_TYPE || type.$$typeof === REACT_PROVIDER_TYPE || type.$$typeof === REACT_CONTEXT_TYPE || type.$$typeof === REACT_FORWARD_REF_TYPE || type.$$typeof === REACT_FUNDAMENTAL_TYPE || type.$$typeof === REACT_RESPONDER_TYPE || type.$$typeof === REACT_SCOPE_TYPE || type.$$typeof === REACT_BLOCK_TYPE);
+  }
+
+  function typeOf(object) {
+    if (typeof object === 'object' && object !== null) {
+      var $$typeof = object.$$typeof;
+
+      switch ($$typeof) {
+        case REACT_ELEMENT_TYPE:
+          var type = object.type;
+
+          switch (type) {
+            case REACT_ASYNC_MODE_TYPE:
+            case REACT_CONCURRENT_MODE_TYPE:
+            case REACT_FRAGMENT_TYPE:
+            case REACT_PROFILER_TYPE:
+            case REACT_STRICT_MODE_TYPE:
+            case REACT_SUSPENSE_TYPE:
+              return type;
+
+            default:
+              var $$typeofType = type && type.$$typeof;
+
+              switch ($$typeofType) {
+                case REACT_CONTEXT_TYPE:
+                case REACT_FORWARD_REF_TYPE:
+                case REACT_LAZY_TYPE:
+                case REACT_MEMO_TYPE:
+                case REACT_PROVIDER_TYPE:
+                  return $$typeofType;
+
+                default:
+                  return $$typeof;
+              }
+
+          }
+
+        case REACT_PORTAL_TYPE:
+          return $$typeof;
+      }
+    }
+
+    return undefined;
+  } // AsyncMode is deprecated along with isAsyncMode
+
+  var AsyncMode = REACT_ASYNC_MODE_TYPE;
+  var ConcurrentMode = REACT_CONCURRENT_MODE_TYPE;
+  var ContextConsumer = REACT_CONTEXT_TYPE;
+  var ContextProvider = REACT_PROVIDER_TYPE;
+  var Element = REACT_ELEMENT_TYPE;
+  var ForwardRef = REACT_FORWARD_REF_TYPE;
+  var Fragment = REACT_FRAGMENT_TYPE;
+  var Lazy = REACT_LAZY_TYPE;
+  var Memo = REACT_MEMO_TYPE;
+  var Portal = REACT_PORTAL_TYPE;
+  var Profiler = REACT_PROFILER_TYPE;
+  var StrictMode = REACT_STRICT_MODE_TYPE;
+  var Suspense = REACT_SUSPENSE_TYPE;
+  var hasWarnedAboutDeprecatedIsAsyncMode = false; // AsyncMode should be deprecated
+
+  function isAsyncMode(object) {
+    {
+      if (!hasWarnedAboutDeprecatedIsAsyncMode) {
+        hasWarnedAboutDeprecatedIsAsyncMode = true; // Using console['warn'] to evade Babel and ESLint
+
+        console['warn']('The ReactIs.isAsyncMode() alias has been deprecated, ' + 'and will be removed in React 17+. Update your code to use ' + 'ReactIs.isConcurrentMode() instead. It has the exact same API.');
+      }
+    }
+
+    return isConcurrentMode(object) || typeOf(object) === REACT_ASYNC_MODE_TYPE;
+  }
+  function isConcurrentMode(object) {
+    return typeOf(object) === REACT_CONCURRENT_MODE_TYPE;
+  }
+  function isContextConsumer(object) {
+    return typeOf(object) === REACT_CONTEXT_TYPE;
+  }
+  function isContextProvider(object) {
+    return typeOf(object) === REACT_PROVIDER_TYPE;
+  }
+  function isElement(object) {
+    return typeof object === 'object' && object !== null && object.$$typeof === REACT_ELEMENT_TYPE;
+  }
+  function isForwardRef(object) {
+    return typeOf(object) === REACT_FORWARD_REF_TYPE;
+  }
+  function isFragment(object) {
+    return typeOf(object) === REACT_FRAGMENT_TYPE;
+  }
+  function isLazy(object) {
+    return typeOf(object) === REACT_LAZY_TYPE;
+  }
+  function isMemo(object) {
+    return typeOf(object) === REACT_MEMO_TYPE;
+  }
+  function isPortal(object) {
+    return typeOf(object) === REACT_PORTAL_TYPE;
+  }
+  function isProfiler(object) {
+    return typeOf(object) === REACT_PROFILER_TYPE;
+  }
+  function isStrictMode(object) {
+    return typeOf(object) === REACT_STRICT_MODE_TYPE;
+  }
+  function isSuspense(object) {
+    return typeOf(object) === REACT_SUSPENSE_TYPE;
+  }
+
+  exports.AsyncMode = AsyncMode;
+  exports.ConcurrentMode = ConcurrentMode;
+  exports.ContextConsumer = ContextConsumer;
+  exports.ContextProvider = ContextProvider;
+  exports.Element = Element;
+  exports.ForwardRef = ForwardRef;
+  exports.Fragment = Fragment;
+  exports.Lazy = Lazy;
+  exports.Memo = Memo;
+  exports.Portal = Portal;
+  exports.Profiler = Profiler;
+  exports.StrictMode = StrictMode;
+  exports.Suspense = Suspense;
+  exports.isAsyncMode = isAsyncMode;
+  exports.isConcurrentMode = isConcurrentMode;
+  exports.isContextConsumer = isContextConsumer;
+  exports.isContextProvider = isContextProvider;
+  exports.isElement = isElement;
+  exports.isForwardRef = isForwardRef;
+  exports.isFragment = isFragment;
+  exports.isLazy = isLazy;
+  exports.isMemo = isMemo;
+  exports.isPortal = isPortal;
+  exports.isProfiler = isProfiler;
+  exports.isStrictMode = isStrictMode;
+  exports.isSuspense = isSuspense;
+  exports.isValidElementType = isValidElementType;
+  exports.typeOf = typeOf;
+    })();
+  }
+  });
+  var reactIs_development_1 = reactIs_development.AsyncMode;
+  var reactIs_development_2 = reactIs_development.ConcurrentMode;
+  var reactIs_development_3 = reactIs_development.ContextConsumer;
+  var reactIs_development_4 = reactIs_development.ContextProvider;
+  var reactIs_development_5 = reactIs_development.Element;
+  var reactIs_development_6 = reactIs_development.ForwardRef;
+  var reactIs_development_7 = reactIs_development.Fragment;
+  var reactIs_development_8 = reactIs_development.Lazy;
+  var reactIs_development_9 = reactIs_development.Memo;
+  var reactIs_development_10 = reactIs_development.Portal;
+  var reactIs_development_11 = reactIs_development.Profiler;
+  var reactIs_development_12 = reactIs_development.StrictMode;
+  var reactIs_development_13 = reactIs_development.Suspense;
+  var reactIs_development_14 = reactIs_development.isAsyncMode;
+  var reactIs_development_15 = reactIs_development.isConcurrentMode;
+  var reactIs_development_16 = reactIs_development.isContextConsumer;
+  var reactIs_development_17 = reactIs_development.isContextProvider;
+  var reactIs_development_18 = reactIs_development.isElement;
+  var reactIs_development_19 = reactIs_development.isForwardRef;
+  var reactIs_development_20 = reactIs_development.isFragment;
+  var reactIs_development_21 = reactIs_development.isLazy;
+  var reactIs_development_22 = reactIs_development.isMemo;
+  var reactIs_development_23 = reactIs_development.isPortal;
+  var reactIs_development_24 = reactIs_development.isProfiler;
+  var reactIs_development_25 = reactIs_development.isStrictMode;
+  var reactIs_development_26 = reactIs_development.isSuspense;
+  var reactIs_development_27 = reactIs_development.isValidElementType;
+  var reactIs_development_28 = reactIs_development.typeOf;
+
+  var reactIs = createCommonjsModule(function (module) {
+
+  {
+    module.exports = reactIs_development;
+  }
+  });
 
   /*
   object-assign
@@ -390,6 +658,7 @@
   {
     var ReactPropTypesSecret$1 = ReactPropTypesSecret_1;
     var loggedTypeFailures = {};
+    var has = Function.call.bind(Object.prototype.hasOwnProperty);
 
     printWarning = function(text) {
       var message = 'Warning: ' + text;
@@ -419,7 +688,7 @@
   function checkPropTypes(typeSpecs, values, location, componentName, getStack) {
     {
       for (var typeSpecName in typeSpecs) {
-        if (typeSpecs.hasOwnProperty(typeSpecName)) {
+        if (has(typeSpecs, typeSpecName)) {
           var error;
           // Prop type validation may throw. In case they do, we don't want to
           // fail the render phase where it didn't fail before. So we log it.
@@ -448,7 +717,6 @@
               'creator (arrayOf, instanceOf, objectOf, oneOf, oneOfType, and ' +
               'shape all require an argument).'
             );
-
           }
           if (error instanceof Error && !(error.message in loggedTypeFailures)) {
             // Only monitor this failure once because there tends to be a lot of the
@@ -466,8 +734,20 @@
     }
   }
 
+  /**
+   * Resets warning cache when testing.
+   *
+   * @private
+   */
+  checkPropTypes.resetWarningCache = function() {
+    {
+      loggedTypeFailures = {};
+    }
+  };
+
   var checkPropTypes_1 = checkPropTypes;
 
+  var has$1 = Function.call.bind(Object.prototype.hasOwnProperty);
   var printWarning$1 = function() {};
 
   {
@@ -578,6 +858,7 @@
       any: createAnyTypeChecker(),
       arrayOf: createArrayOfTypeChecker,
       element: createElementTypeChecker(),
+      elementType: createElementTypeTypeChecker(),
       instanceOf: createInstanceTypeChecker,
       node: createNodeChecker(),
       objectOf: createObjectOfTypeChecker,
@@ -638,7 +919,7 @@
             );
             err.name = 'Invariant Violation';
             throw err;
-          } else if (typeof console !== 'undefined') {
+          } else if ( typeof console !== 'undefined') {
             // Old behavior for people using React.PropTypes
             var cacheKey = componentName + ':' + propName;
             if (
@@ -731,6 +1012,18 @@
       return createChainableTypeChecker(validate);
     }
 
+    function createElementTypeTypeChecker() {
+      function validate(props, propName, componentName, location, propFullName) {
+        var propValue = props[propName];
+        if (!reactIs.isValidElementType(propValue)) {
+          var propType = getPropType(propValue);
+          return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` of type ' + ('`' + propType + '` supplied to `' + componentName + '`, expected a single ReactElement type.'));
+        }
+        return null;
+      }
+      return createChainableTypeChecker(validate);
+    }
+
     function createInstanceTypeChecker(expectedClass) {
       function validate(props, propName, componentName, location, propFullName) {
         if (!(props[propName] instanceof expectedClass)) {
@@ -745,7 +1038,16 @@
 
     function createEnumTypeChecker(expectedValues) {
       if (!Array.isArray(expectedValues)) {
-        printWarning$1('Invalid argument supplied to oneOf, expected an instance of array.');
+        {
+          if (arguments.length > 1) {
+            printWarning$1(
+              'Invalid arguments supplied to oneOf, expected an array, got ' + arguments.length + ' arguments. ' +
+              'A common mistake is to write oneOf(x, y, z) instead of oneOf([x, y, z]).'
+            );
+          } else {
+            printWarning$1('Invalid argument supplied to oneOf, expected an array.');
+          }
+        }
         return emptyFunctionThatReturnsNull;
       }
 
@@ -757,8 +1059,14 @@
           }
         }
 
-        var valuesString = JSON.stringify(expectedValues);
-        return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` of value `' + propValue + '` ' + ('supplied to `' + componentName + '`, expected one of ' + valuesString + '.'));
+        var valuesString = JSON.stringify(expectedValues, function replacer(key, value) {
+          var type = getPreciseType(value);
+          if (type === 'symbol') {
+            return String(value);
+          }
+          return value;
+        });
+        return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` of value `' + String(propValue) + '` ' + ('supplied to `' + componentName + '`, expected one of ' + valuesString + '.'));
       }
       return createChainableTypeChecker(validate);
     }
@@ -774,7 +1082,7 @@
           return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` of type ' + ('`' + propType + '` supplied to `' + componentName + '`, expected an object.'));
         }
         for (var key in propValue) {
-          if (propValue.hasOwnProperty(key)) {
+          if (has$1(propValue, key)) {
             var error = typeChecker(propValue, key, componentName, location, propFullName + '.' + key, ReactPropTypesSecret_1);
             if (error instanceof Error) {
               return error;
@@ -788,7 +1096,7 @@
 
     function createUnionTypeChecker(arrayOfTypeCheckers) {
       if (!Array.isArray(arrayOfTypeCheckers)) {
-        printWarning$1('Invalid argument supplied to oneOfType, expected an instance of array.');
+         printWarning$1('Invalid argument supplied to oneOfType, expected an instance of array.') ;
         return emptyFunctionThatReturnsNull;
       }
 
@@ -931,6 +1239,11 @@
         return true;
       }
 
+      // falsy value can't be a Symbol
+      if (!propValue) {
+        return false;
+      }
+
       // 19.4.3.5 Symbol.prototype[@@toStringTag] === 'Symbol'
       if (propValue['@@toStringTag'] === 'Symbol') {
         return true;
@@ -1005,6 +1318,7 @@
     }
 
     ReactPropTypes.checkPropTypes = checkPropTypes_1;
+    ReactPropTypes.resetWarningCache = checkPropTypes_1.resetWarningCache;
     ReactPropTypes.PropTypes = ReactPropTypes;
 
     return ReactPropTypes;
@@ -1019,21 +1333,12 @@
    */
 
   {
-    var REACT_ELEMENT_TYPE = (typeof Symbol === 'function' &&
-      Symbol.for &&
-      Symbol.for('react.element')) ||
-      0xeac7;
-
-    var isValidElement = function(object) {
-      return typeof object === 'object' &&
-        object !== null &&
-        object.$$typeof === REACT_ELEMENT_TYPE;
-    };
+    var ReactIs = reactIs;
 
     // By explicitly using `prop-types` you are opting into new development behavior.
     // http://fb.me/prop-types-in-prod
     var throwOnDirectAccess = true;
-    module.exports = factoryWithTypeCheckers(isValidElement, throwOnDirectAccess);
+    module.exports = factoryWithTypeCheckers(ReactIs.isElement, throwOnDirectAccess);
   }
   });
 
@@ -1122,7 +1427,7 @@
 
 
     function unsubscribe(instance) {
-      menus.delete(instance.getName());
+      menus["delete"](instance.getName());
     }
     /**
      * Updates layout infomration.
@@ -1638,7 +1943,7 @@
         this._isMenuClosing = true;
         return Promise.all([hideMenu, hideBackdrop]).then(function () {
           _this3._isMenuClosing = false;
-        }).catch(function (err) {
+        })["catch"](function (err) {
           _this3._isMenuClosing = false;
           throw err;
         });
@@ -2141,8 +2446,7 @@
 
       _this = _super.call(this, props);
       _this.state = {
-        opacityAnim: new reactNative.Animated.Value(0),
-        scaleAnim: new reactNative.Animated.Value(0.8)
+        scaleAnim: new reactNative.Animated.Value(0.1)
       };
       return _this;
     }
@@ -2156,12 +2460,6 @@
           easing: reactNative.Easing.out(reactNative.Easing.cubic),
           useNativeDriver: USE_NATIVE_DRIVER
         }).start();
-        reactNative.Animated.timing(this.state.opacityAnim, {
-          duration: OPEN_ANIM_DURATION,
-          toValue: 1,
-          easing: reactNative.Easing.out(reactNative.Easing.cubic),
-          useNativeDriver: true
-        }).start();
       }
     }, {
       key: "close",
@@ -2171,16 +2469,10 @@
         return new Promise(function (resolve) {
           reactNative.Animated.timing(_this2.state.scaleAnim, {
             duration: CLOSE_ANIM_DURATION,
-            toValue: 0.8,
-            easing: reactNative.Easing.in(reactNative.Easing.cubic),
+            toValue: 0,
+            easing: reactNative.Easing["in"](reactNative.Easing.cubic),
             useNativeDriver: USE_NATIVE_DRIVER
           }).start(resolve);
-          reactNative.Animated.timing(_this2.state.opacityAnim, {
-            duration: CLOSE_ANIM_DURATION,
-            toValue: 0,
-            easing: reactNative.Easing.in(reactNative.Easing.cubic),
-            useNativeDriver: true
-          }).start();
         });
       }
     }, {
@@ -2198,9 +2490,9 @@
           }],
           opacity: this.state.scaleAnim
         };
-        var position = computePosition$1(layouts, false);
+        var position = computePosition$1(layouts, reactNative.I18nManager.isRTL);
         return /*#__PURE__*/React__default.createElement(reactNative.Animated.View, _extends({}, other, {
-          style: [styles$4.options, style, animation]
+          style: [styles$4.options, style, animation, position]
         }), children);
       }
     }]);
@@ -2212,14 +2504,17 @@
   var styles$4 = reactNative.StyleSheet.create({
     options: {
       position: 'absolute',
+      borderRadius: 2,
+      backgroundColor: 'white',
+      width: reactNative.PixelRatio.roundToNearestPixel(200),
       // Shadow only works on iOS.
       shadowColor: 'black',
+      shadowOpacity: 0.3,
       shadowOffset: {
         width: 3,
         height: 3
       },
-      shadowOpacity: 0.2,
-      shadowRadius: 5.0,
+      shadowRadius: 4,
       // This will elevate the view on Android, causing shadow to be drawn.
       elevation: 5
     }
@@ -2548,23 +2843,591 @@
   });
   var MenuOption$1 = withCtx(MenuOption);
 
-  // import SlideInMenu from './renderers/SlideInMenu';
-  // import Popover from './renderers/Popover';
+  /**
+  Simplified version of ContextMenu without animation.
+  */
+
+  var NotAnimatedContextMenu = /*#__PURE__*/function (_React$Component) {
+    _inherits(NotAnimatedContextMenu, _React$Component);
+
+    var _super = _createSuper(NotAnimatedContextMenu);
+
+    function NotAnimatedContextMenu() {
+      _classCallCheck(this, NotAnimatedContextMenu);
+
+      return _super.apply(this, arguments);
+    }
+
+    _createClass(NotAnimatedContextMenu, [{
+      key: "render",
+      value: function render() {
+        var _this$props = this.props,
+            style = _this$props.style,
+            children = _this$props.children,
+            layouts = _this$props.layouts,
+            other = _objectWithoutProperties(_this$props, ["style", "children", "layouts"]);
+
+        var position = computePosition$1(layouts);
+        return /*#__PURE__*/React__default.createElement(reactNative.View, _extends({}, other, {
+          style: [styles$4.options, style, position]
+        }), children);
+      }
+    }]);
+
+    return NotAnimatedContextMenu;
+  }(React__default.Component);
+
+  var computePosition$2 = function computePosition(layouts) {
+    var windowLayout = layouts.windowLayout,
+        optionsLayout = layouts.optionsLayout;
+    var wHeight = windowLayout.height;
+    var oHeight = optionsLayout.height;
+    var top = wHeight - oHeight;
+    var left = 0,
+        right = 0;
+    var position = {
+      top: top,
+      left: left,
+      right: right
+    }; // TODO what is the best way to handle safeArea?
+    // most likely some extra paddings inside SlideInMenu 
+
+    return position;
+  };
+
+  var SlideInMenu = /*#__PURE__*/function (_React$Component) {
+    _inherits(SlideInMenu, _React$Component);
+
+    var _super = _createSuper(SlideInMenu);
+
+    function SlideInMenu(props) {
+      var _this;
+
+      _classCallCheck(this, SlideInMenu);
+
+      _this = _super.call(this, props);
+      _this.state = {
+        slide: new reactNative.Animated.Value(0)
+      };
+      return _this;
+    }
+
+    _createClass(SlideInMenu, [{
+      key: "componentDidMount",
+      value: function componentDidMount() {
+        reactNative.Animated.timing(this.state.slide, {
+          duration: OPEN_ANIM_DURATION,
+          toValue: 1,
+          easing: reactNative.Easing.out(reactNative.Easing.cubic),
+          useNativeDriver: USE_NATIVE_DRIVER
+        }).start();
+      }
+    }, {
+      key: "close",
+      value: function close() {
+        var _this2 = this;
+
+        return new Promise(function (resolve) {
+          reactNative.Animated.timing(_this2.state.slide, {
+            duration: CLOSE_ANIM_DURATION,
+            toValue: 0,
+            easing: reactNative.Easing["in"](reactNative.Easing.cubic),
+            useNativeDriver: USE_NATIVE_DRIVER
+          }).start(resolve);
+        });
+      }
+    }, {
+      key: "render",
+      value: function render() {
+        var _this$props = this.props,
+            style = _this$props.style,
+            children = _this$props.children,
+            layouts = _this$props.layouts,
+            other = _objectWithoutProperties(_this$props, ["style", "children", "layouts"]);
+
+        var oHeight = layouts.optionsLayout.height;
+        var animation = {
+          transform: [{
+            translateY: this.state.slide.interpolate({
+              inputRange: [0, 1],
+              outputRange: [oHeight, 0]
+            })
+          }]
+        };
+        var position = computePosition$2(layouts);
+        return /*#__PURE__*/React__default.createElement(reactNative.Animated.View, _extends({
+          style: [styles$5.options, style, animation, position]
+        }, other), children);
+      }
+    }]);
+
+    return SlideInMenu;
+  }(React__default.Component);
+  var styles$5 = reactNative.StyleSheet.create({
+    options: {
+      position: 'absolute',
+      backgroundColor: 'white',
+      // Shadow only works on iOS.
+      shadowColor: 'black',
+      shadowOpacity: 0.3,
+      shadowOffset: {
+        width: 3,
+        height: 3
+      },
+      shadowRadius: 4,
+      // This will elevate the view on Android, causing shadow to be drawn.
+      elevation: 5
+    }
+  });
+
+  var popoverPadding = 7;
+  var anchorSize = 15;
+  var anchorHyp = Math.sqrt(anchorSize * anchorSize + anchorSize * anchorSize);
+  var anchorOffset = (anchorHyp + anchorSize) / 2 - popoverPadding; // left/top placement
+
+  function axisNegativeSideProperties(_ref) {
+    var oDim = _ref.oDim,
+        tPos = _ref.tPos;
+    return {
+      position: tPos - oDim
+    };
+  } // right/bottom placement
+
+
+  function axisPositiveSideProperties(_ref2) {
+    var tPos = _ref2.tPos,
+        tDim = _ref2.tDim;
+    // substract also anchor placeholder from the beginning
+    return {
+      position: tPos + tDim - anchorSize
+    };
+  } // computes offsets (off screen overlap) of popover when trying to align it to the center
+
+
+  function centeringProperties(_ref3) {
+    var oDim = _ref3.oDim,
+        wDim = _ref3.wDim,
+        tPos = _ref3.tPos,
+        tDim = _ref3.tDim;
+    var center = Math.round(tPos + tDim / 2);
+    var leftOffset = oDim / 2 - center;
+    var rightOffset = center + oDim / 2 - wDim;
+    return {
+      center: center,
+      leftOffset: leftOffset,
+      rightOffset: rightOffset
+    };
+  }
+  /**
+   * Computes position and offset of popover when trying to align it to the triger center.
+   * It consideres window boundaries.
+   * Returns object with keys:
+   *   - position: <Number> Absolute position - top/left,
+   *   - offset: <Number> window overlapping size if window boundaries were not considered
+   */
+
+
+  function axisCenteredPositionProperties(options) {
+    var oDim = options.oDim,
+        wDim = options.wDim;
+
+    var _centeringProperties = centeringProperties(options),
+        center = _centeringProperties.center,
+        leftOffset = _centeringProperties.leftOffset,
+        rightOffset = _centeringProperties.rightOffset;
+
+    if (leftOffset > 0 || rightOffset > 0) {
+      // right/bottom position is better
+      if (leftOffset < rightOffset) {
+        return {
+          offset: rightOffset,
+          position: wDim - oDim
+        };
+      } // left/top position is better
+
+
+      if (rightOffset < leftOffset) {
+        return {
+          offset: -leftOffset,
+          position: 0
+        };
+      }
+    } // centered position
+
+
+    return {
+      offset: 0,
+      position: center - oDim / 2
+    };
+  }
+  /* Evaluate centering placement */
+
+
+  function getCenteringPrice(options) {
+    var _centeringProperties2 = centeringProperties(options),
+        leftOffset = _centeringProperties2.leftOffset,
+        rightOffset = _centeringProperties2.rightOffset; // TODO: currently shifted popovers have higher price,
+    // popover shift could be taken into account with the same price
+
+
+    return Math.max(0, leftOffset) + Math.max(0, rightOffset);
+  }
+  /* Evaluate top placement */
+
+
+  function getTopPrice(hOptions, vOptions) {
+    var centerOffset = getCenteringPrice(vOptions);
+    var sideOffset = Math.max(0, hOptions.oDim - hOptions.tPos);
+    return centerOffset + sideOffset;
+  }
+  /* Evaluate bottom placement */
+
+
+  function getBottomPrice(hOptions, vOptions) {
+    var centerOffset = getCenteringPrice(vOptions);
+    var sideOffset = Math.max(0, hOptions.tPos + hOptions.tDim + hOptions.oDim - hOptions.wDim);
+    return centerOffset + sideOffset;
+  }
+  /* Evaluate left placement */
+
+
+  function getLeftPrice(hOptions, vOptions) {
+    var centerOffset = getCenteringPrice(hOptions);
+    var sideOffset = Math.max(0, vOptions.oDim - vOptions.tPos);
+    return centerOffset + sideOffset;
+  }
+  /* Evaluate right placement */
+
+
+  function getRightPrice(hOptions, vOptions) {
+    var centerOffset = getCenteringPrice(hOptions);
+    var sideOffset = Math.max(0, vOptions.tPos + vOptions.tDim + vOptions.oDim - vOptions.wDim);
+    return centerOffset + sideOffset;
+  }
+
+  function getStartPosKey(isRTL) {
+    return isRTL ? 'right' : 'left';
+  }
+
+  function topProperties(hOptions, vOptions, isRTL) {
+    var centered = axisCenteredPositionProperties(vOptions);
+    var side = axisNegativeSideProperties(hOptions);
+    return {
+      position: _defineProperty({
+        top: side.position
+      }, getStartPosKey(isRTL), centered.position),
+      offset: centered.offset,
+      placement: 'top'
+    };
+  }
+
+  function bottomProperties(hOptions, vOptions, isRTL) {
+    var centered = axisCenteredPositionProperties(vOptions);
+    var side = axisPositiveSideProperties(hOptions);
+    return {
+      position: _defineProperty({
+        top: side.position
+      }, getStartPosKey(isRTL), centered.position),
+      offset: centered.offset,
+      placement: 'bottom'
+    };
+  }
+
+  function rightProperties(hOptions, vOptions, isRTL) {
+    var centered = axisCenteredPositionProperties(hOptions);
+    var side = axisPositiveSideProperties(vOptions);
+    return {
+      position: _defineProperty({
+        top: centered.position
+      }, getStartPosKey(isRTL), side.position),
+      offset: centered.offset,
+      placement: 'right'
+    };
+  }
+
+  function leftProperties(hOptions, vOptions, isRTL) {
+    var centered = axisCenteredPositionProperties(hOptions);
+    var side = axisNegativeSideProperties(vOptions);
+    return {
+      position: _defineProperty({
+        top: centered.position
+      }, getStartPosKey(isRTL), side.position),
+      offset: centered.offset,
+      placement: 'left'
+    };
+  } // maps placement to function which computes correct properties
+
+
+  var propertiesByPlacement = {
+    top: topProperties,
+    bottom: bottomProperties,
+    left: leftProperties,
+    right: rightProperties
+  };
+  /**
+   * Computes properties needed for drawing popover.
+   * Returns object with keys:
+   *   - position: <Object> { top: Number, left: Number } - popover absolute position
+   *   - placement: <Enum> top|left|top|bottom - position to the trigger
+   *   - offset: <Number> value by which must be anchor shifted
+   */
+
+  function computeProperties(_ref4, placement, preferredPlacement, isRTL) {
+    var windowLayout = _ref4.windowLayout,
+        triggerLayout = _ref4.triggerLayout,
+        optionsLayout = _ref4.optionsLayout;
+    var wX = windowLayout.x,
+        wY = windowLayout.y,
+        wWidth = windowLayout.width,
+        wHeight = windowLayout.height;
+    var tX = triggerLayout.x,
+        tY = triggerLayout.y,
+        tHeight = triggerLayout.height,
+        tWidth = triggerLayout.width;
+    var oHeight = optionsLayout.height,
+        oWidth = optionsLayout.width;
+    var hOptions = {
+      oDim: oHeight + popoverPadding * 2,
+      wDim: wHeight,
+      tPos: tY - wY,
+      tDim: tHeight
+    };
+    var vOptions = {
+      oDim: oWidth + popoverPadding * 2,
+      wDim: wWidth,
+      tPos: tX - wX,
+      tDim: tWidth
+    };
+
+    if (placement !== 'auto' && propertiesByPlacement[placement]) {
+      return propertiesByPlacement[placement](hOptions, vOptions, isRTL);
+    }
+
+    var prices = {
+      top: getTopPrice(hOptions, vOptions),
+      bottom: getBottomPrice(hOptions, vOptions),
+      right: getRightPrice(hOptions, vOptions),
+      left: getLeftPrice(hOptions, vOptions)
+    };
+    var bestPrice = Object.values(prices).sort(function (a, b) {
+      return a - b;
+    })[0];
+    var bestPlacement = prices[preferredPlacement] === bestPrice ? preferredPlacement : Object.keys(prices).find(function (pl) {
+      return prices[pl] === bestPrice;
+    });
+    return propertiesByPlacement[bestPlacement](hOptions, vOptions, isRTL);
+  }
+
+  var Popover = /*#__PURE__*/function (_React$Component) {
+    _inherits(Popover, _React$Component);
+
+    var _super = _createSuper(Popover);
+
+    function Popover(props) {
+      var _this;
+
+      _classCallCheck(this, Popover);
+
+      _this = _super.call(this, props);
+      _this.state = {
+        scaleAnim: new reactNative.Animated.Value(0.1)
+      };
+      return _this;
+    }
+
+    _createClass(Popover, [{
+      key: "componentDidMount",
+      value: function componentDidMount() {
+        reactNative.Animated.timing(this.state.scaleAnim, {
+          duration: OPEN_ANIM_DURATION,
+          toValue: 1,
+          easing: reactNative.Easing.out(reactNative.Easing.cubic),
+          useNativeDriver: USE_NATIVE_DRIVER
+        }).start();
+      }
+    }, {
+      key: "close",
+      value: function close() {
+        var _this2 = this;
+
+        return new Promise(function (resolve) {
+          reactNative.Animated.timing(_this2.state.scaleAnim, {
+            duration: CLOSE_ANIM_DURATION,
+            toValue: 0,
+            easing: reactNative.Easing["in"](reactNative.Easing.cubic),
+            useNativeDriver: USE_NATIVE_DRIVER
+          }).start(resolve);
+        });
+      }
+    }, {
+      key: "render",
+      value: function render() {
+        var _this$props = this.props,
+            style = _this$props.style,
+            children = _this$props.children,
+            layouts = _this$props.layouts,
+            anchorStyle = _this$props.anchorStyle,
+            preferredPlacement = _this$props.preferredPlacement,
+            userPlacement = _this$props.placement,
+            other = _objectWithoutProperties(_this$props, ["style", "children", "layouts", "anchorStyle", "preferredPlacement", "placement"]);
+
+        var isRTL = reactNative.I18nManager.isRTL;
+        var animation = {
+          transform: [{
+            scale: this.state.scaleAnim
+          }],
+          opacity: this.state.scaleAnim
+        };
+
+        var _computeProperties = computeProperties(layouts, userPlacement, preferredPlacement, isRTL),
+            position = _computeProperties.position,
+            placement = _computeProperties.placement,
+            offset = _computeProperties.offset;
+
+        return /*#__PURE__*/React__default.createElement(reactNative.Animated.View, {
+          style: [styles$6.animated, animation, position, getContainerStyle({
+            placement: placement,
+            isRTL: isRTL
+          })],
+          pointerEvents: "box-none"
+        }, /*#__PURE__*/React__default.createElement(reactNative.View, {
+          style: [styles$6.anchor, dynamicAnchorStyle({
+            placement: placement,
+            offset: offset,
+            isRTL: isRTL
+          }), anchorStyle]
+        }), /*#__PURE__*/React__default.createElement(reactNative.View, _extends({}, other, {
+          style: [styles$6.options, style]
+        }), children));
+      }
+    }]);
+
+    return Popover;
+  }(React__default.Component);
+  Popover.propTypes = {
+    anchorStyle: propTypes.oneOfType([propTypes.object, propTypes.number, propTypes.array]),
+    placement: propTypes.oneOf(['auto', 'top', 'right', 'bottom', 'left']),
+    preferredPlacement: propTypes.oneOf(['top', 'right', 'bottom', 'left'])
+  };
+  Popover.defaultProps = {
+    preferredPlacement: 'top',
+    placement: 'auto'
+  };
+
+  var getContainerStyle = function getContainerStyle(_ref5) {
+    var placement = _ref5.placement,
+        isRTL = _ref5.isRTL;
+    return {
+      left: {
+        flexDirection: isRTL ? 'row' : 'row-reverse'
+      },
+      right: {
+        flexDirection: isRTL ? 'row-reverse' : 'row'
+      },
+      top: {
+        flexDirection: 'column-reverse'
+      },
+      bottom: {
+        flexDirection: 'column'
+      }
+    }[placement];
+  };
+
+  var dynamicAnchorStyle = function dynamicAnchorStyle(_ref6) {
+    var _ref7, _ref8;
+
+    var offset = _ref6.offset,
+        placement = _ref6.placement,
+        isRTL = _ref6.isRTL;
+    var start = getStartPosKey(isRTL);
+
+    switch (placement) {
+      case 'right':
+        return {
+          top: offset,
+          transform: [{
+            translateX: anchorOffset
+          }, {
+            rotate: '45deg'
+          }]
+        };
+
+      case 'left':
+        return {
+          top: offset,
+          transform: [{
+            translateX: -anchorOffset
+          }, {
+            rotate: '45deg'
+          }]
+        };
+
+      case 'top':
+        return _ref7 = {}, _defineProperty(_ref7, start, offset), _defineProperty(_ref7, "transform", [{
+          translateY: -anchorOffset
+        }, {
+          rotate: '45deg'
+        }]), _ref7;
+
+      case 'bottom':
+        return _ref8 = {}, _defineProperty(_ref8, start, offset), _defineProperty(_ref8, "transform", [{
+          translateY: anchorOffset
+        }, {
+          rotate: '45deg'
+        }]), _ref8;
+    }
+  };
+
+  var styles$6 = reactNative.StyleSheet.create({
+    animated: {
+      padding: popoverPadding,
+      backgroundColor: 'transparent',
+      position: 'absolute',
+      alignItems: 'center'
+    },
+    options: {
+      borderRadius: 2,
+      minWidth: anchorHyp,
+      minHeight: anchorHyp,
+      backgroundColor: 'white',
+      // Shadow only works on iOS.
+      shadowColor: 'black',
+      shadowOpacity: 0.3,
+      shadowOffset: {
+        width: 3,
+        height: 3
+      },
+      shadowRadius: 4,
+      // This will elevate the view on Android, causing shadow to be drawn.
+      elevation: 5
+    },
+    anchor: {
+      width: anchorSize,
+      height: anchorSize,
+      backgroundColor: 'white',
+      elevation: 5
+    }
+  });
 
   var renderers = {
-    ContextMenu: ContextMenu
-  }; // const MenuContext = deprecatedComponent(
+    ContextMenu: ContextMenu,
+    SlideInMenu: SlideInMenu,
+    NotAnimatedContextMenu: NotAnimatedContextMenu,
+    Popover: Popover
+  };
+  var MenuContext = deprecatedComponent('MenuContext is deprecated and it might be removed in future releases, use MenuProvider instead.', ['openMenu', 'toggleMenu', 'closeMenu', 'isMenuOpen'])(MenuProvider);
 
-  exports.default = MenuExternal;
   exports.Menu = MenuExternal;
-  exports.MenuProvider = MenuProvider;
+  exports.MenuContext = MenuContext;
   exports.MenuOption = MenuOption$1;
   exports.MenuOptions = MenuOptions$1;
+  exports.MenuProvider = MenuProvider;
   exports.MenuTrigger = MenuTrigger$1;
+  exports.default = MenuExternal;
   exports.renderers = renderers;
   exports.withMenuContext = withCtx;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 
-}));
+})));
 //# sourceMappingURL=rnpm.js.map

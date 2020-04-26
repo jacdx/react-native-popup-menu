@@ -1,5 +1,5 @@
 import React from 'react';
-import { Animated, Easing, StyleSheet, PixelRatio } from 'react-native';
+import { I18nManager, Animated, Easing, StyleSheet, PixelRatio } from 'react-native';
 import { OPEN_ANIM_DURATION, CLOSE_ANIM_DURATION, USE_NATIVE_DRIVER } from '../constants';
 
 const axisPosition = (oDim, wDim, tPos, tDim) => {
@@ -74,8 +74,7 @@ export default class ContextMenu extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      opacityAnim: new Animated.Value(0),
-      scaleAnim: new Animated.Value(0.8),
+      scaleAnim: new Animated.Value(0.1),
     };
   }
 
@@ -86,28 +85,16 @@ export default class ContextMenu extends React.Component {
       easing: Easing.out(Easing.cubic),
       useNativeDriver: USE_NATIVE_DRIVER,
     }).start();
-    Animated.timing(this.state.opacityAnim, {
-      duration: OPEN_ANIM_DURATION,
-      toValue: 1,
-      easing: Easing.out(Easing.cubic),
-      useNativeDriver: true,
-    }).start();
   }
 
   close() {
     return new Promise(resolve => {
       Animated.timing(this.state.scaleAnim, {
         duration: CLOSE_ANIM_DURATION,
-        toValue: 0.8,
+        toValue: 0,
         easing: Easing.in(Easing.cubic),
         useNativeDriver: USE_NATIVE_DRIVER,
       }).start(resolve);
-      Animated.timing(this.state.opacityAnim, {
-        duration: CLOSE_ANIM_DURATION,
-        toValue: 0,
-        easing: Easing.in(Easing.cubic),
-        useNativeDriver: true,
-      }).start();
     });
   }
 
@@ -117,9 +104,9 @@ export default class ContextMenu extends React.Component {
       transform: [ { scale: this.state.scaleAnim } ],
       opacity: this.state.scaleAnim,
     };
-    const position = computePosition(layouts, false);
+    const position = computePosition(layouts, I18nManager.isRTL);
     return (
-      <Animated.View {...other} style={[styles.options, style, animation]}>
+      <Animated.View {...other} style={[styles.options, style, animation, position]}>
         {children}
       </Animated.View>
     );
@@ -134,15 +121,15 @@ ContextMenu.fitPositionIntoSafeArea = fitPositionIntoSafeArea;
 export const styles = StyleSheet.create({
   options: {
     position: 'absolute',
+    borderRadius: 2,
+    backgroundColor: 'white',
+    width: PixelRatio.roundToNearestPixel(200),
 
     // Shadow only works on iOS.
     shadowColor: 'black',
-    shadowOffset: {
-      width: 3,
-      height: 3,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 5.0,
+    shadowOpacity: 0.3,
+    shadowOffset: { width: 3, height: 3 },
+    shadowRadius: 4,
 
     // This will elevate the view on Android, causing shadow to be drawn.
     elevation: 5,
