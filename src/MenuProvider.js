@@ -305,7 +305,8 @@ export default class MenuProvider extends Component {
     const onLayout = e => this._onOptionsLayout(e, instance.getName(), isOutside);
     const style = [optionsContainerStyle, customStyles.optionsContainer];
     const layouts = { windowLayout, triggerLayout, optionsLayout, safeAreaLayout };
-    const props = { ...rendererProps, style, onLayout, layouts };
+    //jacdx: add context to renderer props
+    const props = { ...rendererProps, style, onLayout, layouts, ctx: this.menuCtx };
     const optionsType = isOutside ? MenuOutside : renderer;
     if (!isFunctional(optionsType)) {
       props.ref = this.onOptionsRef;

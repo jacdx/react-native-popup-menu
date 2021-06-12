@@ -19,19 +19,16 @@ export class MenuTrigger extends Component {
     const onPress = () => !disabled && this._onPress();
     const { Touchable, defaultTouchableProps } = makeTouchable(customStyles.TriggerTouchableComponent);
     return (
-      <View ref={onRef} collapsable={false} style={customStyles.triggerOuterWrapper}>
         <Touchable
+          ref={onRef}
           onPress={triggerOnLongPress ? onAlternativeAction : onPress}
           onLongPress={triggerOnLongPress ? onPress : onAlternativeAction}
           {...touchableProps}
           {...defaultTouchableProps}
           {...customStyles.triggerTouchable}
         >
-          <View {...other} style={[customStyles.triggerWrapper, style]}>
-            {text ? <Text style={customStyles.triggerText}>{text}</Text> : children}
-          </View>
+            {children}
         </Touchable>
-      </View>
     );
   }
 

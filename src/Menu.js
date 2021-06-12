@@ -25,9 +25,10 @@ export class Menu extends Component {
   }
 
   componentDidMount() {
-    if (!this._validateChildren()) {
-      return;
-    }
+    // remove type checks in children
+    // if (!this._validateChildren()) {
+    //   return;
+    // }
     debug('subscribing menu', this._name);
     this.props.ctx.menuRegistry.subscribe(this);
     this.props.ctx.menuActions._notify();
@@ -113,18 +114,18 @@ export class Menu extends Component {
     this._opened = opened;
   }
 
-  _validateChildren() {
-    const children = React.Children.toArray(this.props.children);
-    const options = children.find(isMenuOptions);
-    if (!options) {
-      console.warn('Menu has to contain MenuOptions component');
-    }
-    const trigger = children.find(isTrigger);
-    if (!trigger) {
-      console.warn('Menu has to contain MenuTrigger component');
-    }
-    return options && trigger;
-  }
+  // _validateChildren() {
+  //   const children = React.Children.toArray(this.props.children);
+  //   const options = children.find(isMenuOptions);
+  //   if (!options) {
+  //     console.warn('Menu has to contain MenuOptions component');
+  //   }
+  //   const trigger = children.find(isTrigger);
+  //   if (!trigger) {
+  //     console.warn('Menu has to contain MenuTrigger component');
+  //   }
+  //   return options && trigger;
+  // }
 
 }
 
