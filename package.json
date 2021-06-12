@@ -8,7 +8,7 @@
   },
   "scripts": {
     "build": "rollup -c rollup.config.babel.js",
-    "prepublish": "yarn build",
+    "prepublishOnly": "yarn build",
     "test": "jest",
     "lint": "eslint ."
   },
